@@ -8,7 +8,7 @@
  * Version: 0.7.3
  * License: GPLv2 or later
  */
- 
+
 // Exit if accessed directly
 if (!defined('ABSPATH'))
   exit;
@@ -34,7 +34,7 @@ if (in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get_
 	        add_action('woocommerce_product_write_panels', array($this, 'product_write_panel'));
 	        add_action('woocommerce_process_product_meta', array($this, 'product_save_data'), 10, 2);
 	        // frontend stuff
-	        add_action('woocommerce_after_add_to_cart_form', array($this, 'product_sample_button'));      
+	        add_action('woocommerce_after_add_to_cart_form', array($this, 'product_sample_button'));
 			add_action('wp_enqueue_scripts', array($this, 'enqueue_scripts'));
 			//add_action('woocommerce_add_to_cart', $cart_item_key, $product_id, $quantity, $variation_id, $variation, $cart_item_data );
 			//do_action( 'woocommerce_add_to_cart', $cart_item_key, $product_id, $quantity, $variation_id, $variation, $cart_item_data );
@@ -44,20 +44,20 @@ if (in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get_
 			add_filter('woocommerce_add_cart_item', array( $this, 'add_sample_to_cart_item' ), 10, 2 );
 			add_filter('woocommerce_get_item_data', array( $this, 'get_item_data' ), 10, 2 );
 			add_filter('woocommerce_get_cart_item_from_session', array( $this, 'filter_session'), 10, 3);
-			add_filter('woocommerce_in_cart_product_title', array( $this, 'cart_title'), 10, 3);
+			add_filter('woocommerce_cart_item_name', array( $this, 'cart_title'), 10, 3);
 			add_filter('woocommerce_cart_widget_product_title', array( $this, 'cart_widget_product_title'), 10, 2);
 			add_filter('woocommerce_cart_item_quantity', array( $this, 'cart_item_quantity'), 10, 2);
-	
+
 			add_filter('woocommerce_shipping_free_shipping_is_available', array( $this, 'enable_free_shipping'), 40, 1);
 			add_filter('woocommerce_available_shipping_methods', array( $this, 'free_shipping_filter'), 10, 1);
 
 			add_action('woocommerce_add_order_item_meta', array($this, 'add_order_item_meta'), 10, 2);
-			
+
 			// filter for Minimum/Maximum plugin override overriding
 			if (in_array('woocommerce-min-max-quantities/min-max-quantities.php', apply_filters('active_plugins', get_option('active_plugins')))) {
 				add_filter('wc_min_max_quantity_minimum_allowed_quantity', array($this, 'minimum_quantity'), 10, 4 );
 				add_filter('wc_min_max_quantity_maximum_allowed_quantity', array($this, 'maximum_quantity'), 10, 4 );
-				add_filter('wc_min_max_quantity_group_of_quantity', array($this, 'group_of_quantity'), 10, 4 );			
+				add_filter('wc_min_max_quantity_group_of_quantity', array($this, 'group_of_quantity'), 10, 4 );
 			}
 
 			// filter for Measurement Price Calculator plugin override overriding
@@ -82,14 +82,14 @@ if (in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get_
 				woocommerce_add_order_item_meta( $item_id, 'product type', 'sample');
 			}
 		}
-		
+
 		// filter for Minimum/Maximum plugin overriding
 		function minimum_quantity($minimum_quantity, $checking_id, $cart_item_key, $values){
 			if ($values['sample'])
 				$minimum_quantity = 1;
 			return $minimum_quantity;
 		}
-      
+
 		function maximum_quantity($maximum_quantity, $checking_id, $cart_item_key, $values){
 			if ($values['sample'])
 				$maximum_quantity = 1;
@@ -113,11 +113,11 @@ if (in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get_
 						$sample_shipping_mode = get_post_meta($cart_item['product_id'], 'sample_shipping_mode', true);
 						if ($sample_shipping_mode !== 'free'){
 							$check = false;
-							break;							
+							break;
 						}else{
 							// sample is setted - we go on to check all other items in cart
 						}
-						
+
 					}else{
 						$check = false;
 						break;
@@ -140,10 +140,10 @@ if (in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get_
 				// Get Free Shipping array into a new array
 				$freeshipping = array();
 				$freeshipping = $available_methods['free_shipping'];
-		 
+
 				// Empty the $available_methods array
 				unset( $available_methods );
-		 
+
 				// Add Free Shipping back into $avaialble_methods
 				$available_methods = array();
                 $available_methods['free_shipping'] = $freeshipping;
@@ -159,24 +159,24 @@ if (in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get_
       	      	      if ($cart_item['sample']){
       	      	      	      $product_quantity = sprintf( '1 <input type="hidden" name="cart[%s][qty]" value="1" />', $cart_item_key );
       	      	      }
-      	      }			
-      	      return $product_quantity; 
+      	      }
+      	      return $product_quantity;
       }
-      
+
       function cart_title($title, $values, $cart_item_key){
       	      if ($values['sample']){
       	      	      $title .= ' [' . __('Sample','woosample') . '] ';
       	      }
       	      return $title;
       }
-	  
+
       function cart_widget_product_title($title, $cart_item){
 			if (is_array($cart_item) && $cart_item['sample']){
 				$title .= ' [' . __('Sample','woosample') . '] ';
 			}
 			return $title;
 	  }
-      
+
       function filter_session($cart_content, $value, $key){
       	      if ($value['sample']){
       	      	      $cart_content['sample'] = true;
@@ -195,7 +195,7 @@ if (in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get_
       	      }
       	      return $cart_content;
       }
-      
+
       function get_item_data($item_data, $cart_item){
       	      global $cart_item_key;
        	      //if ($cart_item['sample']){
@@ -205,7 +205,7 @@ if (in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get_
       	      //}
       	      return $item_data;
       }
-      
+
       function add_sample_to_cart_item_data ($cart_item_data, $product_id, $variation_id){
       	      if (get_post_meta($product_id, 'sample_enamble') && $_REQUEST['sample']){
 					$cart_item_data['sample'] = true;
@@ -220,7 +220,7 @@ if (in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get_
 		}
 		return $cart_item;
 	}
-	  
+
       /**
        * add_to_cart_validation function.
        *
@@ -232,7 +232,7 @@ if (in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get_
        */
       function add_to_cart_validation( $pass, $product_id, $quantity, $variation_id = 0 ) {
 	global $woocommerce;
-	
+
 	// se ci sono articoli nel carrello eseguiamo i controlli altrimenti se il carrello è vuoto aggiungiamo l'elemento senza controlli ulteriori
 	if ( sizeof( $woocommerce->cart->get_cart() ) > 0 ) {
 		$is_sample = empty($_REQUEST['sample']) ? false : true;
@@ -241,14 +241,14 @@ if (in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get_
 			// l'articolo richiesto è un "campione" controlliamo che non sia già stato inserito nel carrello
 			$cart_items = $woocommerce->cart->get_cart();
 			$unique_key = md5($product_id . 'sample');
-			
+
 			foreach ($cart_items as $cart_id_key => $cart_item){
 				if ($cart_item['unique_key'] == $unique_key){
-					$woocommerce->add_error( __( 'A sample of the same product is already present into your cart', 'woosample' ) );
+					wc_add_notice( __( 'A sample of the same product is already present into your cart', 'woosample' ), 'error' );
 					return false;
 				}
 				if ($cart_item['product_id'] == $product_id){
-					$woocommerce->add_error( __( 'You have already added this product on your cart, you can\'t add a sample of the same item', 'woosample' ) );
+					wc_add_notice( __( 'You have already added this product on your cart, you can\'t add a sample of the same item', 'woosample' ), 'error' );
 					return false;
 				}
 			}
@@ -336,7 +336,7 @@ if (in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get_
         }else{
           update_post_meta($post_id, 'sample_enamble', true);
         }
-		
+
 		$sample_price_mode = $_POST['sample_price_mode'];
         update_post_meta($post_id, 'sample_price_mode', $sample_price_mode);
 		$sample_price = $_POST['sample_price'];
@@ -351,7 +351,7 @@ if (in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get_
         //  if(!empty($video)) update_post_meta($post_id, 'wo_di_video_product'.$key, stripslashes($video));
         //  else delete_post_meta($post_id, 'wo_di_video_product'.$key);
         //}
-        
+
       }
 
 		public function product_sample_button() {
@@ -374,7 +374,7 @@ if (in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get_
 			<?php
 			}
 		}
-	  
+
 		function enqueue_scripts() {
 			global $pagenow, $wp_scripts;
 			$plugin_url = untrailingslashit(plugin_dir_url(__FILE__));
@@ -387,9 +387,9 @@ if (in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get_
 			}
 			*/
 		}
-	  
-      
-    }//end of the class  
+
+
+    }//end of the class
   }//end of the if, if the class exists
 
   /*
